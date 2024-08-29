@@ -1,0 +1,7 @@
+notepad-ui/node_modules/*
+notepad-ui/build/*
+notepad-ui/.vscode/*
+
+NotePadAPI/.vs/*
+NotePadAPI/bin/*
+NotePadAPI/obj/*
