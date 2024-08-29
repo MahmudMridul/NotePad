@@ -1,4 +1,8 @@
 
+using Microsoft.EntityFrameworkCore;
+using NotePadAPI.Db;
+using NotePadAPI.Db.IDb;
+
 namespace NotePadAPI
 {
     public class Program
@@ -8,6 +12,22 @@ namespace NotePadAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            // Add Db contexts
+            bool useInMemoryDb = builder.Configuration.GetValue<bool>("UseInMemoryDb");
+            if (useInMemoryDb)
+            {
+                builder.Services.AddDbContext<InMemoryContext>(
+                    op => op.UseInMemoryDatabase("InMemoryDb")
+                );
+                builder.Services.AddScoped<IDbContext, InMemoryContext>();
+            }
+            else
+            {
+                builder.Services.AddDbContext<NotePadContext>(
+                    op => op.UseSqlServer(builder.Configuration.GetConnectionString("Default"))
+                );
+                builder.Services.AddScoped<IDbContext, NotePadContext>();
+            }
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
