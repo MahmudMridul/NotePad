@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using NotePadAPI.Db;
 using NotePadAPI.Db.IDb;
+using Serilog;
 
 namespace NotePadAPI
 {
@@ -29,6 +30,12 @@ namespace NotePadAPI
                 builder.Services.AddScoped<IDbContext, NotePadContext>();
             }
 
+            // Add Serilog configuration
+            builder.Host.UseSerilog((context, config) => 
+            {
+                config.ReadFrom.Configuration(context.Configuration);
+            });
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -42,6 +49,8 @@ namespace NotePadAPI
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            // Add Serilog configuration
+            app.UseSerilogRequestLogging();
 
             app.UseHttpsRedirection();
 
