@@ -10,5 +10,8 @@ namespace NotePadAPI.Models
         public string Description { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime LastUpdatedAt { get; set; }
+        // Relationship with User
+        public int UserId { get; set; }
+        public User User { get; set; } = null!;
     }
 }

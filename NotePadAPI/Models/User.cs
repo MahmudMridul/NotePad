@@ -12,6 +12,6 @@ namespace NotePadAPI.Models
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
         public byte[] PasswordSalt { get; set; } = null!;
-        
+        public ICollection<Note> Notes { get; set; } = new List<Note>(1);
     }
 }
