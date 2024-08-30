@@ -39,7 +39,7 @@ namespace NotePadAPI.Utils
             return regex.IsMatch(password);
         }
 
-        internal static object GetSaltAndHash(string password)
+        internal static object GetPasswordSaltAndHash(string password)
         {
             byte[] salt = GenerateSalt();
             string hash = HashPassword(password, salt);
