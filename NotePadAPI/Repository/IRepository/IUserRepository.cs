@@ -5,7 +5,8 @@ namespace NotePadAPI.Repository.IRepository
 {
     public interface IUserRepository
     {
+        Task<IEnumerable<User>> GetAllUsers();
         Task<bool> EmailExists(string email);
-        Task<ActionResult<ApiResponse>> RegisterUser(User user);
+        void RegisterUser(User user);
     }
 }

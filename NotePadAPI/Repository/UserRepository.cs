@@ -15,6 +15,11 @@ namespace NotePadAPI.Repository
             _db = db;
         }
 
+        public async Task<IEnumerable<User>> GetAllUsers()
+        {
+            return await _db.Users.AsNoTracking().ToListAsync();
+        }
+
         public async Task<bool> EmailExists(string email)
         {
             return await _db.Users.AnyAsync(user => user.Email == email);   
