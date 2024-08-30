@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NotePadAPI.Db;
 using NotePadAPI.Db.IDb;
+using NotePadAPI.Repository;
+using NotePadAPI.Repository.IRepository;
 using Serilog;
 
 namespace NotePadAPI
@@ -30,6 +32,9 @@ namespace NotePadAPI
                 );
                 builder.Services.AddScoped<IDbContext, NotePadContext>();
             }
+
+            // Repositories
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
 
             // Serilog configuration
             builder.Host.UseSerilog((context, config) => 
