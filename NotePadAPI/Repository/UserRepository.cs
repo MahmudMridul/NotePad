@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using NotePadAPI.Db.IDb;
+using NotePadAPI.Models;
 using NotePadAPI.Repository.IRepository;
 
 namespace NotePadAPI.Repository
@@ -16,6 +18,12 @@ namespace NotePadAPI.Repository
         public async Task<bool> EmailExists(string email)
         {
             return await _db.Users.AnyAsync(user => user.Email == email);   
+        }
+
+        public async void RegisterUser(User user)
+        {
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync();
         }
     }
 }
