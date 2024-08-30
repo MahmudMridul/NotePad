@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NotePadAPI.Models;
 using NotePadAPI.Models.DTO;
-using NotePadAPI.Repository;
 using NotePadAPI.Repository.IRepository;
 using NotePadAPI.Utils;
 using System.Net;
