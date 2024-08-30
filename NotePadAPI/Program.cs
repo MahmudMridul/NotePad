@@ -14,7 +14,7 @@ namespace NotePadAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            // Add Db contexts
+            // Db contexts
             bool useInMemoryDb = builder.Configuration.GetValue<bool>("UseInMemoryDb");
             if (useInMemoryDb)
             {
@@ -31,33 +31,44 @@ namespace NotePadAPI
                 builder.Services.AddScoped<IDbContext, NotePadContext>();
             }
 
-            // Add Serilog configuration
+            // Serilog configuration
             builder.Host.UseSerilog((context, config) => 
             {
                 config.ReadFrom.Configuration(context.Configuration);
             });
+
+            // CORS
+            builder.Services.AddCors(op => 
+                op.AddPolicy(
+                    "AllowAll",
+                    policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
+                )
+            );
 
             // Controller options
             builder.Services.AddControllers(
                 op => op.Filters.Add(new ProducesAttribute("application/json"))
             );
 
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            // Swagger/OpenAPI configuration. (https://aka.ms/aspnetcore/swashbuckle)
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            // Add Serilog configuration
+            // Serilog configuration
             app.UseSerilogRequestLogging();
 
             app.UseHttpsRedirection();
+
+            // CORS
+            app.UseCors("AllowAll");
 
             app.UseAuthorization();
 
