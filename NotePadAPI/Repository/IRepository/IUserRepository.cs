@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using NotePadAPI.Models;
+﻿using NotePadAPI.Models;
 
 namespace NotePadAPI.Repository.IRepository
 {

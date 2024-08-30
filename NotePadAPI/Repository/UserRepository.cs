@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using NotePadAPI.Db.IDb;
 using NotePadAPI.Models;
 using NotePadAPI.Repository.IRepository;

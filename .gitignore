@@ -5,3 +5,4 @@ notepad-ui/.vscode/*
 NotePadAPI/.vs/*
 NotePadAPI/bin/*
 NotePadAPI/obj/*
+NotePadAPI/Logs/*
