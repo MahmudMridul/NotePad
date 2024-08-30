@@ -1,4 +1,5 @@
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NotePadAPI.Db;
 using NotePadAPI.Db.IDb;
@@ -36,7 +37,11 @@ namespace NotePadAPI
                 config.ReadFrom.Configuration(context.Configuration);
             });
 
-            builder.Services.AddControllers();
+            // Controller options
+            builder.Services.AddControllers(
+                op => op.Filters.Add(new ProducesAttribute("application/json"))
+            );
+
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
