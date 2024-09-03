@@ -96,6 +96,28 @@ namespace NotePadAPI.Controllers
             }
         }
 
+        [HttpPost("login")]
+        public async Task<ActionResult<ApiResponse>> Login([FromBody] UserLoginDto loginDto)
+        {
+            User? user = await _repo.GetUserByEmail(loginDto.Email);
+
+            if (user == null)
+            {
+                CreateResponse("This email is not registered", HttpStatusCode.Conflict);
+                return Conflict(_res);
+            }
+
+            if(!UserUtils.IsPasswordCorrect(loginDto.Password, user.PasswordSalt, user.PasswordHash))
+            {
+                CreateResponse("Incorrect password", HttpStatusCode.Unauthorized);
+                return Unauthorized(_res);
+            }
+
+            string token = UserUtils.GetToken(loginDto.Email, user.PasswordHash);
+            CreateResponse("Login successful", HttpStatusCode.OK, token, true);
+            return Ok(_res);
+        }
+
         // GET: api/<UserController>
         //[HttpGet]
         //public IEnumerable<string> Get()
