@@ -6,3 +6,5 @@ NotePadAPI/.vs/*
 NotePadAPI/bin/*
 NotePadAPI/obj/*
 NotePadAPI/Logs/*
+
+.github/*
