@@ -1,4 +1,7 @@
-﻿using System.Net.Mail;
+﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -87,6 +90,25 @@ namespace NotePadAPI.Utils
                 Console.WriteLine(e.Message);
             }
             return "";
+        }
+
+        internal static string GetToken(string userName, string secretKey)
+        {
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            byte[] key = Encoding.ASCII.GetBytes(secretKey);
+            SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor()
+            {
+                Subject = new ClaimsIdentity(
+                    new Claim[]
+                    {
+                        new Claim(ClaimTypes.Name, userName)
+                    }
+                ),
+                Expires = DateTime.UtcNow.AddMinutes(20),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            SecurityToken token = handler.CreateToken(descriptor);
+            return handler.WriteToken(token);
         }
     }
 }
