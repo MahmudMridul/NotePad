@@ -92,6 +92,12 @@ namespace NotePadAPI.Utils
             return "";
         }
 
+        internal static bool IsPasswordCorrect(string password, byte[] salt, string savedHash)
+        {
+            string newHash = HashPassword(password, salt);
+            return newHash == savedHash;
+        }
+
         internal static string GetToken(string userName, string secretKey)
         {
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
