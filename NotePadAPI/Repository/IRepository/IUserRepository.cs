@@ -7,5 +7,6 @@ namespace NotePadAPI.Repository.IRepository
         Task<IEnumerable<User>> GetAllUsers();
         Task<bool> EmailExists(string email);
         void RegisterUser(User user);
+        Task<User> GetUserByEmail(string email);
     }
 }

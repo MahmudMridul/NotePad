@@ -29,5 +29,10 @@ namespace NotePadAPI.Repository
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
         }
+
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            return _db.Users.FirstOrDefault(user => user.Email == email);
+        }
     }
 }
