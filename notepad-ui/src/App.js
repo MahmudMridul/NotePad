@@ -1,7 +1,8 @@
 import React from 'react'
+import LoginRegistration from './pages/LoginRegistration'
 
 export default function App() {
    return (
-      <div>App</div>
+      <div> <LoginRegistration/> </div>
    )
 }
