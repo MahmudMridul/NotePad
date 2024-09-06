@@ -114,7 +114,14 @@ namespace NotePadAPI.Controllers
             }
 
             string token = UserUtils.GetToken(loginDto.Email, user.PasswordHash);
-            CreateResponse("Login successful", HttpStatusCode.OK, token, true);
+            var loginObj = new
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Token = token,
+            };
+                
+            CreateResponse("Login successful", HttpStatusCode.OK, loginObj, true);
             return Ok(_res);
         }
 
