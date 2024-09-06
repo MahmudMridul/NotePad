@@ -20,7 +20,7 @@ export default function LoginRegistration() {
       setShowPassword(!showPassword);
    }
 
-   function setToSignUpMode() {
+   function toggleSigninSignup() {
       setIsLogin(!isLogin);
    }
 
@@ -82,7 +82,7 @@ export default function LoginRegistration() {
                sx={{ cursor: "pointer" }}
                align="right"
                color="info"
-               onClick={setToSignUpMode}
+               onClick={toggleSigninSignup}
             >
                {isLogin ? "Create an account" : "Sign In"}
             </Typography>
