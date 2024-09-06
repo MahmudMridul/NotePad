@@ -16,12 +16,31 @@ export default function LoginRegistration() {
    const [showPassword, setShowPassword] = useState(false);
    const [isLogin, setIsLogin] = useState(true);
 
+   const [name, setName] = useState("");
+   const [email, setEmail] = useState("");
+   const [password, setPassword] = useState("");
+
    function handleClickShowPassword() {
       setShowPassword(!showPassword);
    }
 
    function toggleSigninSignup() {
       setIsLogin(!isLogin);
+   }
+
+   function handleName(e) {
+      let v = e.target.value;
+      setName(v);
+   }
+
+   function handleEmail(e) {
+      let v = e.target.value;
+      setEmail(v);
+   }
+
+   function handlePassword(e) {
+      let v = e.target.value;
+      setPassword(v);
    }
 
    return (
@@ -41,6 +60,8 @@ export default function LoginRegistration() {
                label="Name"
                type="text"
                size="small"
+               value={name}
+               onChange={handleName}
             />
 
             <TextField
@@ -49,6 +70,8 @@ export default function LoginRegistration() {
                label="Email"
                type="email"
                size="small"
+               value={email}
+               onChange={handleEmail}
             />
 
             <FormControl size="small" variant="outlined" required>
@@ -71,6 +94,8 @@ export default function LoginRegistration() {
                      </InputAdornment>
                   }
                   label="Password"
+                  value={password}
+                  onChange={handlePassword}
                />
             </FormControl>
 
