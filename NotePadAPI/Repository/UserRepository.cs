@@ -32,7 +32,7 @@ namespace NotePadAPI.Repository
 
         public async Task<User?> GetUserByEmail(string email)
         {
-            return _db.Users.FirstOrDefault(user => user.Email == email);
+            return await _db.Users.FirstOrDefaultAsync(user => user.Email == email);
         }
     }
 }
