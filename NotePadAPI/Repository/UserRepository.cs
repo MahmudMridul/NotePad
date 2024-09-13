@@ -26,7 +26,7 @@ namespace NotePadAPI.Repository
 
         public async void RegisterUser(User user)
         {
-            _db.Users.Add(user);
+            await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
         }
 
