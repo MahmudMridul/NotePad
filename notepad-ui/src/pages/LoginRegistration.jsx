@@ -28,7 +28,14 @@ export default function LoginRegistration() {
       setShowPassword(!showPassword);
    }
 
+   function resetFields() {
+      setName("");
+      setEmail("");
+      setPassword("");
+   }
+
    function toggleSigninSignup() {
+      resetFields();
       setIsLogin(!isLogin);
    }
 
