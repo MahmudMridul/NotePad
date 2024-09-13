@@ -11,8 +11,12 @@ import {
    Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { signUp } from "../appSlice";
 
 export default function LoginRegistration() {
+   const dispatch = useDispatch();
+
    const [showPassword, setShowPassword] = useState(false);
    const [isLogin, setIsLogin] = useState(true);
 
@@ -41,6 +45,25 @@ export default function LoginRegistration() {
    function handlePassword(e) {
       let v = e.target.value;
       setPassword(v);
+   }
+
+   function handleSignInSignUp() {
+      if (isLogin) {
+         handleSignIn();
+      } else {
+         handleSignUp();
+      }
+   }
+
+   function handleSignIn() {}
+
+   function handleSignUp() {
+      const obj = {
+         name,
+         email,
+         password,
+      };
+      dispatch(signUp(obj));
    }
 
    return (
@@ -99,7 +122,11 @@ export default function LoginRegistration() {
                />
             </FormControl>
 
-            <Button sx={{ width: 300, mb: 3 }} variant="outlined">
+            <Button
+               sx={{ width: 300, mb: 3 }}
+               variant="outlined"
+               onClick={handleSignInSignUp}
+            >
                {isLogin ? "Sign In" : "Sign Up"}
             </Button>
 
