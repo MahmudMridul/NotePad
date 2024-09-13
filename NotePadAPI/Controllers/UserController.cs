@@ -118,9 +118,19 @@ namespace NotePadAPI.Controllers
             {
                 Name = user.Name,
                 Email = user.Email,
-                Token = token,
             };
-                
+
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,       // Prevents access via JavaScript
+                Secure = true,         // Ensures the cookie is only sent over HTTPS
+                SameSite = SameSiteMode.Strict,  // Prevents CSRF attacks
+                Expires = DateTime.UtcNow.AddHours(1)  // Set the expiration of the token (optional)
+            };
+
+            // Append the token to the response as a cookie
+            Response.Cookies.Append("AuthToken", token, cookieOptions);
+
             CreateResponse("Login successful", HttpStatusCode.OK, loginObj, true);
             return Ok(_res);
         }
