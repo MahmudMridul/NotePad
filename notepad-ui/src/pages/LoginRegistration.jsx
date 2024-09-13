@@ -12,7 +12,8 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { signUp } from "../appSlice";
+import { signIn, signUp } from "../appSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginRegistration() {
    const dispatch = useDispatch();
@@ -23,6 +24,8 @@ export default function LoginRegistration() {
    const [name, setName] = useState("");
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
+
+   const navigate = useNavigate();
 
    function handleClickShowPassword() {
       setShowPassword(!showPassword);
@@ -62,7 +65,19 @@ export default function LoginRegistration() {
       }
    }
 
-   function handleSignIn() {}
+   function handleSignIn() {
+      const obj = {
+         email,
+         password,
+      };
+      dispatch(signIn(obj)).then((res) => {
+         if (res.payload.isSuccess) {
+            navigate("/home");
+         } else {
+            console.log("stay in this page");
+         }
+      });
+   }
 
    function handleSignUp() {
       const obj = {

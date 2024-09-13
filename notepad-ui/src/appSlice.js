@@ -3,16 +3,6 @@ import { apis } from "./utils";
 
 const initialState = {};
 
-export const signIn = createAsyncThunk(
-   "app/signIn",
-   async (obj, { dispatch, getState }) => {
-      try {
-      } catch (err) {
-         console.error("app/signIn", err);
-      }
-   }
-);
-
 export const signUp = createAsyncThunk(
    "app/signUp",
    async (obj, { dispatch, getState }) => {
@@ -30,6 +20,27 @@ export const signUp = createAsyncThunk(
          return data;
       } catch (err) {
          console.error("app/signUp", err);
+      }
+   }
+);
+
+export const signIn = createAsyncThunk(
+   "app/signIn",
+   async (obj, { dispatch, getState }) => {
+      try {
+         const url = apis.login;
+         const res = await fetch(url, {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+               Accept: "application/json",
+            },
+            body: JSON.stringify(obj),
+         });
+         const data = await res.json();
+         return data;
+      } catch (err) {
+         console.error("app/signIn", err);
       }
    }
 );
@@ -63,6 +74,16 @@ export const appSlice = createSlice({
          .addCase(signUp.rejected, (state, action) => {
             // business logics
             console.log("sign up rejected");
+         })
+
+         .addCase(signIn.pending, (state, action) => {
+            // show loading
+         })
+         .addCase(signIn.fulfilled, (state, action) => {
+            //business logics
+         })
+         .addCase(signIn.rejected, (state, action) => {
+            // business logics
          });
    },
 });
