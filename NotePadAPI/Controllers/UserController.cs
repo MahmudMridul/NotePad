@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using NotePadAPI.Models;
 using NotePadAPI.Models.DTO;
 using NotePadAPI.Repository.IRepository;
@@ -13,11 +14,13 @@ namespace NotePadAPI.Controllers
     {
         private readonly IUserRepository _repo;
         private readonly ApiResponse _res;
+        private readonly IConfiguration _config;
 
-        public UserController(IUserRepository repo)
+        public UserController(IUserRepository repo, IConfiguration config)
         {
             _repo = repo;
             _res = new ApiResponse();    
+            _config = config;
         }
 
         private void CreateResponse(string msg, HttpStatusCode code, object? data = null, bool isSuccess = false)
@@ -28,6 +31,7 @@ namespace NotePadAPI.Controllers
             _res.Message = msg;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ApiResponse>> GetAllUsers()
         {
@@ -113,7 +117,7 @@ namespace NotePadAPI.Controllers
                 return Unauthorized(_res);
             }
 
-            string token = UserUtils.GetToken(loginDto.Email, user.PasswordHash);
+            string token = UserUtils.GetToken(loginDto.Email, _config);
             var loginObj = new
             {
                 Name = user.Name,
