@@ -98,10 +98,10 @@ namespace NotePadAPI.Utils
             return newHash == savedHash;
         }
 
-        internal static string GetToken(string userName, string secretKey)
+        internal static string GetToken(string userName, IConfiguration config)
         {
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            byte[] key = Encoding.ASCII.GetBytes(secretKey);
+            byte[] key = Encoding.ASCII.GetBytes(config["Jwt:Key"]);
             SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor()
             {
                 Subject = new ClaimsIdentity(
@@ -111,6 +111,8 @@ namespace NotePadAPI.Utils
                     }
                 ),
                 Expires = DateTime.UtcNow.AddMinutes(20),
+                Issuer = config["Jwt:Issuer"],
+                Audience = config["Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             SecurityToken token = handler.CreateToken(descriptor);
