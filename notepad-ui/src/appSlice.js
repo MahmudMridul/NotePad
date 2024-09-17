@@ -1,7 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apis } from "./utils";
 
-const initialState = {};
+const initialState = {
+   isAuth: false,
+
+   loggedInUserName: "",
+   loggedInUserEmail: "",
+};
 
 export const signUp = createAsyncThunk(
    "app/signUp",
@@ -80,7 +85,18 @@ export const appSlice = createSlice({
             // show loading
          })
          .addCase(signIn.fulfilled, (state, action) => {
-            //business logics
+            if (action.payload) {
+               const { data, isSuccess, message } = action.payload;
+               const { name, email } = data;
+
+               if (isSuccess) {
+                  state.isAuth = true;
+                  state.loggedInUserName = name;
+                  state.loggedInUserEmail = email;
+               }
+            } else {
+               console.error("Payload for login not found");
+            }
          })
          .addCase(signIn.rejected, (state, action) => {
             // business logics
