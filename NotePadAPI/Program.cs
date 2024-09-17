@@ -82,7 +82,10 @@ namespace NotePadAPI
                 {
                     OnMessageReceived = context =>
                     {
-                        context.Token = context.Request.Cookies["AuthToken"];
+                        if(context.Request.Cookies.ContainsKey("AuthToken"))
+                        {
+                            context.Token = context.Request.Cookies["AuthToken"];
+                        }
                         return Task.CompletedTask;
                     }
                 };
