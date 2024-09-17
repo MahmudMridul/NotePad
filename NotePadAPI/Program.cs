@@ -1,11 +1,14 @@
 
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NotePadAPI.Db;
 using NotePadAPI.Db.IDb;
 using NotePadAPI.Repository;
 using NotePadAPI.Repository.IRepository;
 using Serilog;
+using System.Text;
 
 namespace NotePadAPI
 {
@@ -55,6 +58,35 @@ namespace NotePadAPI
                 op => op.Filters.Add(new ProducesAttribute("application/json"))
             );
 
+            // Configure JWT authentication
+            builder.Services.AddAuthentication(ops =>
+            {
+                ops.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                ops.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(ops =>
+            {
+                ops.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                };
+
+                ops.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["AuthToken"];
+                        return Task.CompletedTask;
+                    }
+                };
+            });
+
             // Swagger/OpenAPI configuration. (https://aka.ms/aspnetcore/swashbuckle)
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -75,6 +107,7 @@ namespace NotePadAPI
             // CORS
             app.UseCors("AllowAll");
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
