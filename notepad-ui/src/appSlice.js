@@ -6,6 +6,8 @@ const initialState = {
 
    loggedInUserName: "",
    loggedInUserEmail: "",
+
+   notes: [],
 };
 
 export const signUp = createAsyncThunk(
@@ -46,6 +48,27 @@ export const signIn = createAsyncThunk(
          return data;
       } catch (err) {
          console.error("app/signIn", err);
+      }
+   }
+);
+
+export const getNotesForUser = createAsyncThunk(
+   "app/getNotesForUser",
+   async (obj, { dispatch, getState }) => {
+      try {
+         const url = apis.notesForUser;
+         const res = await fetch(url, {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+               Accept: "application/json",
+            },
+            body: JSON.stringify(obj),
+         });
+         const data = await res.json();
+         return data;
+      } catch (err) {
+         console.error("app/getNotesForUser", err);
       }
    }
 );
@@ -100,6 +123,24 @@ export const appSlice = createSlice({
          })
          .addCase(signIn.rejected, (state, action) => {
             // business logics
+         })
+
+         .addCase(getNotesForUser.pending, (state, action) => {
+            //logic
+         })
+         .addCase(getNotesForUser.fulfilled, (state, action) => {
+            if (action.payload) {
+               const { data, isSuccess, message } = action.payload;
+               if (isSuccess) {
+                  state.notes = data;
+               }
+               //TODO: handle if isSuccess is false
+            } else {
+               console.error("getNotesForUser", action);
+            }
+         })
+         .addCase(getNotesForUser.rejected, (state, action) => {
+            //logic
          });
    },
 });
