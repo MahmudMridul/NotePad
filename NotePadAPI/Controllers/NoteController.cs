@@ -18,10 +18,9 @@ namespace NotePadAPI.Controllers
             _repo = repo;
         }
 
-        // GET: api/<NoteController>
         [Authorize]
-        [HttpGet]
-        public async Task<ActionResult<ApiResponse>> GetNotesForUser(string email)
+        [HttpPost]
+        public async Task<ActionResult<ApiResponse>> GetNotesForUser([FromBody] string email)
         {
             ApiResponse response;
             try
