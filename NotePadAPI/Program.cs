@@ -20,7 +20,7 @@ namespace NotePadAPI
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            // Db contexts
+            #region Db Context Configurations
             bool useInMemoryDb = builder.Configuration.GetValue<bool>("UseInMemoryDb");
             if (useInMemoryDb)
             {
@@ -36,30 +36,36 @@ namespace NotePadAPI
                 );
                 builder.Services.AddScoped<IDbContext, NotePadContext>();
             }
+            #endregion
 
-            // Repositories
+            #region Repositories
             builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<INoteRepository, NoteRepository>();
+            #endregion
 
-            // Serilog configuration
+            #region Serilog Configurations
             builder.Host.UseSerilog((context, config) => 
             {
                 config.ReadFrom.Configuration(context.Configuration);
             });
+            #endregion
 
-            // CORS
+            #region CORS
             builder.Services.AddCors(op => 
                 op.AddPolicy(
                     "AllowAll",
                     policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
                 )
             );
+            #endregion
 
-            // Controller options
+            #region Controller Configurations
             builder.Services.AddControllers(
                 op => op.Filters.Add(new ProducesAttribute("application/json"))
             );
+            #endregion
 
-            // Configure JWT authentication
+            #region JWT Configurations
             builder.Services.AddAuthentication(ops =>
             {
                 ops.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -90,8 +96,9 @@ namespace NotePadAPI
                     }
                 };
             });
+            #endregion
 
-            // Swagger/OpenAPI configuration. (https://aka.ms/aspnetcore/swashbuckle)
+            #region Swagger OpenAi Configurations
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -122,6 +129,7 @@ namespace NotePadAPI
                     }
                 });
             });
+            #endregion
 
             var app = builder.Build();
 
