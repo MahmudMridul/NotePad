@@ -42,6 +42,7 @@ export const signIn = createAsyncThunk(
                "Content-Type": "application/json",
                Accept: "application/json",
             },
+            credentials: "include",
             body: JSON.stringify(obj),
          });
          const data = await res.json();
@@ -54,7 +55,7 @@ export const signIn = createAsyncThunk(
 
 export const getNotesForUser = createAsyncThunk(
    "app/getNotesForUser",
-   async (obj, { dispatch, getState }) => {
+   async (email, { dispatch, getState }) => {
       try {
          const url = apis.notesForUser;
          const res = await fetch(url, {
@@ -63,10 +64,25 @@ export const getNotesForUser = createAsyncThunk(
                "Content-Type": "application/json",
                Accept: "application/json",
             },
-            body: JSON.stringify(obj),
+            credentials: "include",
+            body: JSON.stringify(email),
          });
-         const data = await res.json();
-         return data;
+
+         if (!res.ok) {
+            console.error(`HTTP Status Error ${res.status} ${res.statusText}`);
+         }
+
+         const text = await res.text();
+         if (!text) {
+            console.error("Empty response");
+         }
+
+         try {
+            const data = JSON.parse(text);
+            return data;
+         } catch (parseError) {
+            console.error("Failed to parse JSON", text);
+         }
       } catch (err) {
          console.error("app/getNotesForUser", err);
       }
