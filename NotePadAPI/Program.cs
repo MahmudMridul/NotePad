@@ -51,10 +51,14 @@ namespace NotePadAPI
             #endregion
 
             #region CORS
-            builder.Services.AddCors(op => 
+            builder.Services.AddCors(op =>
                 op.AddPolicy(
                     "AllowAll",
-                    policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()
+                    policy => policy
+                    .WithOrigins("http://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()
                 )
             );
             #endregion
@@ -81,7 +85,7 @@ namespace NotePadAPI
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
                 };
 
                 ops.Events = new JwtBearerEvents
@@ -93,7 +97,17 @@ namespace NotePadAPI
                             context.Token = context.Request.Cookies["AuthToken"];
                         }
                         return Task.CompletedTask;
-                    }
+                    },
+                    OnAuthenticationFailed = context =>
+                    {
+                        Console.WriteLine($"OnAuthenticationFailed: {context.Exception.Message}");
+                        return Task.CompletedTask;
+                    },
+                    //OnTokenValidated = context =>
+                    //{
+                    //    Console.WriteLine($"OnTokenValidated: {context.SecurityToken}");
+                    //    return Task.CompletedTask;
+                    //}
                 };
             });
             #endregion
