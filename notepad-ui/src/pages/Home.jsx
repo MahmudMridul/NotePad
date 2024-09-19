@@ -10,10 +10,7 @@ export default function Home() {
    const { loggedInUserEmail } = states;
 
    useEffect(() => {
-      const obj = {
-         email: loggedInUserEmail,
-      };
-      dispatch(getNotesForUser(obj));
+      dispatch(getNotesForUser(loggedInUserEmail));
    }, []);
 
    return (
