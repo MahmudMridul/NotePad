@@ -103,40 +103,48 @@ namespace NotePadAPI.Controllers
         [HttpPost("login")]
         public async Task<ActionResult<ApiResponse>> Login([FromBody] UserLoginDto loginDto)
         {
-            User? user = await _repo.GetUserByEmail(loginDto.Email);
-
-            if (user == null)
+            try
             {
-                CreateResponse("This email is not registered", HttpStatusCode.Conflict);
-                return Conflict(_res);
+                User? user = await _repo.GetUserByEmail(loginDto.Email);
+
+                if (user == null)
+                {
+                    CreateResponse("This email is not registered", HttpStatusCode.Conflict);
+                    return Conflict(_res);
+                }
+
+                if (!UserUtils.IsPasswordCorrect(loginDto.Password, user.PasswordSalt, user.PasswordHash))
+                {
+                    CreateResponse("Incorrect password", HttpStatusCode.Unauthorized);
+                    return Unauthorized(_res);
+                }
+
+                string token = UserUtils.GetToken(loginDto.Email, _config);
+                var loginObj = new
+                {
+                    Name = user.Name,
+                    Email = user.Email,
+                };
+
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,       // Prevents access via JavaScript
+                    Secure = true,         // Ensures the cookie is only sent over HTTPS
+                    SameSite = SameSiteMode.None,  // Prevents CSRF attacks
+                    Expires = DateTime.UtcNow.AddHours(1)  // Set the expiration of the token (optional)
+                };
+
+                // Append the token to the response as a cookie
+                Response.Cookies.Append("AuthToken", token, cookieOptions);
+
+                CreateResponse("Login successful", HttpStatusCode.OK, loginObj, true);
+                return Ok(_res);
             }
-
-            if(!UserUtils.IsPasswordCorrect(loginDto.Password, user.PasswordSalt, user.PasswordHash))
+            catch (Exception e)
             {
-                CreateResponse("Incorrect password", HttpStatusCode.Unauthorized);
-                return Unauthorized(_res);
+                CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
+                return StatusCode((int)HttpStatusCode.InternalServerError, _res);
             }
-
-            string token = UserUtils.GetToken(loginDto.Email, _config);
-            var loginObj = new
-            {
-                Name = user.Name,
-                Email = user.Email,
-            };
-
-            var cookieOptions = new CookieOptions
-            {
-                HttpOnly = true,       // Prevents access via JavaScript
-                Secure = true,         // Ensures the cookie is only sent over HTTPS
-                SameSite = SameSiteMode.Strict,  // Prevents CSRF attacks
-                Expires = DateTime.UtcNow.AddHours(1)  // Set the expiration of the token (optional)
-            };
-
-            // Append the token to the response as a cookie
-            Response.Cookies.Append("AuthToken", token, cookieOptions);
-
-            CreateResponse("Login successful", HttpStatusCode.OK, loginObj, true);
-            return Ok(_res);
         }
 
         // GET: api/<UserController>
