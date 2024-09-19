@@ -110,7 +110,7 @@ namespace NotePadAPI.Utils
                         new Claim(ClaimTypes.Name, userName)
                     }
                 ),
-                Expires = DateTime.UtcNow.AddMinutes(20),
+                Expires = DateTime.UtcNow.AddHours(1),
                 Issuer = config["Jwt:Issuer"],
                 Audience = config["Jwt:Audience"],
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
