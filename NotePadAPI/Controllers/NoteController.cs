@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NotePadAPI.Models;
+using NotePadAPI.Models.DTO;
 using NotePadAPI.Repository.IRepository;
 using NotePadAPI.Utils;
 using System.Net;
@@ -34,6 +35,30 @@ namespace NotePadAPI.Controllers
             {
                 response = Utility.CreateResponse(ex.Message, HttpStatusCode.InternalServerError);
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<ApiResponse>> GetNoteForUser(int id) 
+        {
+            ApiResponse res;
+            try
+            {
+                Note? note = await _repo.GetNoteForUser(id);
+
+                if (note == null)
+                {
+                    res = Utility.CreateResponse("Note not found.", HttpStatusCode.NotFound);
+                    return NotFound(res);
+                }
+                res = Utility.CreateResponse("Retrieved note.", HttpStatusCode.OK, note, true);
+                return Ok(res);
+            }
+            catch (Exception ex)
+            {
+                res = Utility.CreateResponse(ex.Message, HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError, res);
             }
         }
 

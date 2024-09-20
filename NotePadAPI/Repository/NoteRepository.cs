@@ -26,5 +26,15 @@ namespace NotePadAPI.Repository
             //    .SelectMany(user => user.Notes)
             //    .ToListAsync();
         }
+
+        public async Task<Note?> GetNoteForUser(int noteId)
+        {
+            Note? n = await (from note in _db.Notes
+                            where note.Id == noteId
+                            select note).FirstOrDefaultAsync();
+
+            //Note? note = await _db.Notes.FirstOrDefaultAsync(note => note.Id == noteId);
+            return n;
+        }
     }
 }
