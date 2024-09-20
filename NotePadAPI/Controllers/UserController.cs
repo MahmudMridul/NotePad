@@ -13,64 +13,56 @@ namespace NotePadAPI.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _repo;
-        private readonly ApiResponse _res;
         private readonly IConfiguration _config;
 
         public UserController(IUserRepository repo, IConfiguration config)
         {
             _repo = repo;
-            _res = new ApiResponse();    
             _config = config;
-        }
-
-        private void CreateResponse(string msg, HttpStatusCode code, object? data = null, bool isSuccess = false)
-        {
-            _res.Data = data;
-            _res.StatusCode = code;
-            _res.IsSuccess = isSuccess;
-            _res.Message = msg;
         }
 
         [Authorize]
         [HttpGet]
         public async Task<ActionResult<ApiResponse>> GetAllUsers()
         {
+            ApiResponse response;
             try
             {
                 IEnumerable<User> users = await _repo.GetAllUsers();
                 string msg = users.Any() ? "Retrieved all users" : "No users found";
-                CreateResponse(msg, HttpStatusCode.OK, users, true);
-                return Ok(_res);
+                response = Utility.CreateResponse(msg, HttpStatusCode.OK, users, true);
+                return Ok(response);
             }
             catch (Exception e) 
             {
-                CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
-                return StatusCode((int)HttpStatusCode.InternalServerError, _res);
+                response = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
 
         [HttpPost("register")]
         public async Task<ActionResult<ApiResponse>> Register([FromBody] UserRegistrationDto newUser)
         {
+            ApiResponse resp;
             try
             {
                 bool emailExists = await _repo.EmailExists(newUser.Email);
                 if (emailExists)
                 {
-                    CreateResponse("This email is already in use", HttpStatusCode.Conflict);
-                    return Conflict(_res);
+                    resp = Utility.CreateResponse("This email is already in use", HttpStatusCode.Conflict);
+                    return Conflict(resp);
                 }
 
                 if (!UserUtils.IsValidEmail(newUser.Email))
                 {
-                    CreateResponse("Email is not valid", HttpStatusCode.BadRequest);
-                    return BadRequest(_res);
+                    resp = Utility.CreateResponse("Email is not valid", HttpStatusCode.BadRequest);
+                    return BadRequest(resp);
                 }
 
                 if (!UserUtils.IsPasswordValid(newUser.Password))
                 {
-                    CreateResponse("Password is not valid", HttpStatusCode.BadRequest);
-                    return BadRequest(_res);
+                    resp = Utility.CreateResponse("Password is not valid", HttpStatusCode.BadRequest);
+                    return BadRequest(resp);
                 }
 
                 var (Salt, Hash) = UserUtils.GetPasswordSaltAndHash(newUser.Password);
@@ -90,33 +82,34 @@ namespace NotePadAPI.Controllers
                     Name = newUser.Name,
                     Email = newUser.Email
                 };
-                CreateResponse("Registration successful", HttpStatusCode.Created, createdUser, true);
-                return CreatedAtAction(nameof(Register), _res);
+                resp = Utility.CreateResponse("Registration successful", HttpStatusCode.Created, createdUser, true);
+                return CreatedAtAction(nameof(Register), resp);
             }
             catch (Exception e) 
             {
-                CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
-                return StatusCode((int)HttpStatusCode.InternalServerError, _res);
+                resp = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
+                return StatusCode((int)HttpStatusCode.InternalServerError, resp);
             }
         }
 
         [HttpPost("login")]
         public async Task<ActionResult<ApiResponse>> Login([FromBody] UserLoginDto loginDto)
         {
+            ApiResponse resp;
             try
             {
                 User? user = await _repo.GetUserByEmail(loginDto.Email);
 
                 if (user == null)
                 {
-                    CreateResponse("This email is not registered", HttpStatusCode.Conflict);
-                    return Conflict(_res);
+                    resp = Utility.CreateResponse("This email is not registered", HttpStatusCode.Conflict);
+                    return Conflict(resp);
                 }
 
                 if (!UserUtils.IsPasswordCorrect(loginDto.Password, user.PasswordSalt, user.PasswordHash))
                 {
-                    CreateResponse("Incorrect password", HttpStatusCode.Unauthorized);
-                    return Unauthorized(_res);
+                    resp = Utility.CreateResponse("Incorrect password", HttpStatusCode.Unauthorized);
+                    return Unauthorized(resp);
                 }
 
                 string token = UserUtils.GetToken(loginDto.Email, _config);
@@ -137,13 +130,13 @@ namespace NotePadAPI.Controllers
                 // Append the token to the response as a cookie
                 Response.Cookies.Append("AuthToken", token, cookieOptions);
 
-                CreateResponse("Login successful", HttpStatusCode.OK, loginObj, true);
-                return Ok(_res);
+                resp = Utility.CreateResponse("Login successful", HttpStatusCode.OK, loginObj, true);
+                return Ok(resp);
             }
             catch (Exception e)
             {
-                CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
-                return StatusCode((int)HttpStatusCode.InternalServerError, _res);
+                resp = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
+                return StatusCode((int)HttpStatusCode.InternalServerError, resp);
             }
         }
 
