@@ -27,7 +27,7 @@ namespace NotePadAPI.Repository
             //    .ToListAsync();
         }
 
-        public async Task<Note?> GetNoteForUser(int noteId)
+        public async Task<Note?> GetNoteById(int noteId)
         {
             Note? n = await (from note in _db.Notes
                             where note.Id == noteId
@@ -35,6 +35,13 @@ namespace NotePadAPI.Repository
 
             //Note? note = await _db.Notes.FirstOrDefaultAsync(note => note.Id == noteId);
             return n;
+        }
+
+        public async Task<Note> CreateNote(Note note)
+        {
+            await _db.Notes.AddAsync(note);
+            await _db.SaveChangesAsync();
+            return note;
         }
     }
 }
