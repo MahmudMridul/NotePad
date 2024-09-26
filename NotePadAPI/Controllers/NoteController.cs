@@ -40,12 +40,12 @@ namespace NotePadAPI.Controllers
 
         [Authorize]
         [HttpGet("{id}")]
-        public async Task<ActionResult<ApiResponse>> GetNoteForUser(int id) 
+        public async Task<ActionResult<ApiResponse>> GetNote(int id) 
         {
             ApiResponse res;
             try
             {
-                Note? note = await _repo.GetNoteForUser(id);
+                Note? note = await _repo.GetNoteById(id);
 
                 if (note == null)
                 {
@@ -61,6 +61,42 @@ namespace NotePadAPI.Controllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, res);
             }
         }
+
+        [Authorize]
+        [HttpPost("create")]
+        public async Task<ActionResult<ApiResponse>> CreateNote([FromBody] CreateNoteDto noteDto)
+        {
+            ApiResponse res;
+            try
+            {
+                if (noteDto == null || noteDto.UserId <= 0 || string.IsNullOrEmpty(noteDto.Title) || string.IsNullOrEmpty(noteDto.Description)) 
+                {
+                    res = Utility.CreateResponse("No data found", HttpStatusCode.BadRequest);
+                    return BadRequest(res);
+                }
+                Note note = new Note
+                {
+                    Title = noteDto.Title,
+                    Description = noteDto.Description,
+                    CreatedAt = DateTime.UtcNow,
+                    LastUpdatedAt = DateTime.UtcNow,
+                    UserId = noteDto.UserId,
+                };
+                await _repo.CreateNote(note);
+                res = Utility.CreateResponse("Note created", HttpStatusCode.OK, note, true);
+                return Ok(res);
+            }
+            catch (Exception e)
+            {
+                res = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError, res);
+            }
+        }
+
+        //public async Task<ActionResult<ApiResponse>> EditNote()
+        //{
+        //    return null;
+        //}
 
         //// GET api/<NoteController>/5
         //[HttpGet("{id}")]
