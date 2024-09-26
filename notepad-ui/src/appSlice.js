@@ -3,6 +3,7 @@ import { apis } from "./utils";
 
 const initialState = {
    isAuth: false,
+   isLoading: false,
 
    loggedInUserName: "",
    loggedInUserEmail: "",
@@ -108,20 +109,23 @@ export const appSlice = createSlice({
    extraReducers: (builder) => {
       builder
          .addCase(signUp.pending, (state, action) => {
-            // show loading
+            state.isLoading = true;
             console.log("sign up pending");
          })
          .addCase(signUp.fulfilled, (state, action) => {
             // business logics
             console.log("sign up fulfilled");
+            state.isLoading = false;
          })
          .addCase(signUp.rejected, (state, action) => {
             // business logics
             console.log("sign up rejected");
+            state.isLoading = false;
          })
 
          .addCase(signIn.pending, (state, action) => {
             // show loading
+            state.isLoading = true;
          })
          .addCase(signIn.fulfilled, (state, action) => {
             if (action.payload) {
@@ -136,13 +140,16 @@ export const appSlice = createSlice({
             } else {
                console.error("Payload for login not found");
             }
+            state.isLoading = false;
          })
          .addCase(signIn.rejected, (state, action) => {
             // business logics
+            state.isLoading = false;
          })
 
          .addCase(getNotesForUser.pending, (state, action) => {
             //logic
+            state.isLoading = true;
          })
          .addCase(getNotesForUser.fulfilled, (state, action) => {
             if (action.payload) {
@@ -154,9 +161,11 @@ export const appSlice = createSlice({
             } else {
                console.error("getNotesForUser", action);
             }
+            state.isLoading = false;
          })
          .addCase(getNotesForUser.rejected, (state, action) => {
             //logic
+            state.isLoading = false;
          });
    },
 });

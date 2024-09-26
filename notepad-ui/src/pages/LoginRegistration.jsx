@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { signIn, signUp } from "../appSlice";
 import { useNavigate } from "react-router-dom";
+import Loading from "../components/Loading";
 
 export default function LoginRegistration() {
    const dispatch = useDispatch();
@@ -98,6 +99,7 @@ export default function LoginRegistration() {
             alignItems: "center",
          }}
       >
+         <Loading />
          <Box sx={{ p: 2, display: "flex", flexDirection: "column" }}>
             <TextField
                sx={{ mb: 3, width: 300, display: isLogin ? "none" : "inherit" }}
