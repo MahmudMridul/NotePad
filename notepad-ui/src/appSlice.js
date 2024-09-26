@@ -5,6 +5,7 @@ const initialState = {
    isAuth: false,
    isLoading: false,
 
+   loggedInUserId: -1,
    loggedInUserName: "",
    loggedInUserEmail: "",
 
@@ -130,10 +131,11 @@ export const appSlice = createSlice({
          .addCase(signIn.fulfilled, (state, action) => {
             if (action.payload) {
                const { data, isSuccess, message } = action.payload;
-               const { name, email } = data;
+               const { id, name, email } = data;
 
                if (isSuccess) {
                   state.isAuth = true;
+                  state.loggedInUserId = id;
                   state.loggedInUserName = name;
                   state.loggedInUserEmail = email;
                }
