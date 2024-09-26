@@ -115,6 +115,7 @@ namespace NotePadAPI.Controllers
                 string token = UserUtils.GetToken(loginDto.Email, _config);
                 var loginObj = new
                 {
+                    Id = user.Id,
                     Name = user.Name,
                     Email = user.Email,
                 };
