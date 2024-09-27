@@ -8,5 +8,6 @@ namespace NotePadAPI.Repository.IRepository
         Task<Note?> GetNoteById(int noteId);
         Task<Note> CreateNote(Note note);
         Task<Note> UpdateNote(Note note);
+        Task<Note> DeleteNote(Note note);
     }
 }
