@@ -43,5 +43,12 @@ namespace NotePadAPI.Repository
             await _db.SaveChangesAsync();
             return note;
         }
+
+        public async Task<Note> UpdateNote(Note note)
+        {
+            _db.Notes.Update(note);
+            await _db.SaveChangesAsync();
+            return note;
+        }
     }
 }

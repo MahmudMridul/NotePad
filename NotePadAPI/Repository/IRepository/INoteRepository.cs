@@ -7,5 +7,6 @@ namespace NotePadAPI.Repository.IRepository
         Task<IEnumerable<Note>> GetNotesForUser(string email);
         Task<Note?> GetNoteById(int noteId);
         Task<Note> CreateNote(Note note);
+        Task<Note> UpdateNote(Note note);
     }
 }
