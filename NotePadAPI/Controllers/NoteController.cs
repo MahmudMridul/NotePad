@@ -93,10 +93,40 @@ namespace NotePadAPI.Controllers
             }
         }
 
-        //public async Task<ActionResult<ApiResponse>> EditNote()
-        //{
-        //    return null;
-        //}
+        [Authorize]
+        [HttpPut("edit/{id}")]
+        public async Task<ActionResult<ApiResponse>> EditNote(int id, [FromBody] EditNoteDto dto)
+        {
+            ApiResponse res;
+            try
+            {
+                if (dto == null || string.IsNullOrEmpty(dto.Title) || string.IsNullOrEmpty(dto.Description))
+                {
+                    res = Utility.CreateResponse("No data found", HttpStatusCode.BadRequest);
+                    return BadRequest(res);
+                }
+
+                Note? note = await _repo.GetNoteById(id);
+                if (note == null)
+                {
+                    res = Utility.CreateResponse("Note doesn't exist", HttpStatusCode.NotFound);
+                    return NotFound(res);
+                }
+
+                note.Title = dto.Title;
+                note.Description = dto.Description;
+                note.LastUpdatedAt = DateTime.UtcNow;
+
+                await _repo.UpdateNote(note);
+                res = Utility.CreateResponse("Note updated", HttpStatusCode.OK, note, true);
+                return Ok(res);
+            }
+            catch (Exception e) 
+            {
+                res = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError, res);
+            }
+        }
 
         //// GET api/<NoteController>/5
         //[HttpGet("{id}")]
