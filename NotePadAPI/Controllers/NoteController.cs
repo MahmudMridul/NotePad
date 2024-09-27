@@ -84,7 +84,7 @@ namespace NotePadAPI.Controllers
                 };
                 await _repo.CreateNote(note);
                 res = Utility.CreateResponse("Note created", HttpStatusCode.OK, note, true);
-                return Ok(res);
+                return StatusCode((int)HttpStatusCode.Created, res);
             }
             catch (Exception e)
             {
@@ -128,29 +128,29 @@ namespace NotePadAPI.Controllers
             }
         }
 
-        //// GET api/<NoteController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
+        [Authorize]
+        [HttpDelete("delete/{id}")]
+        public async Task<ActionResult<ApiResponse>> DeleteNote(int id)
+        {
+            ApiResponse res;
+            try
+            {
+                Note? note = await _repo.GetNoteById(id);
+                if (note == null)
+                {
+                    res = Utility.CreateResponse("Note doesn't exist", HttpStatusCode.NotFound);
+                    return NotFound(res);
+                }
 
-        //// POST api/<NoteController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        //// PUT api/<NoteController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        //// DELETE api/<NoteController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
+                await _repo.DeleteNote(note);
+                res = Utility.CreateResponse("Note deleted", HttpStatusCode.OK, note, true);
+                return StatusCode((int)HttpStatusCode.Gone, res);
+            }
+            catch (Exception e)
+            {
+                res = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError);
+                return StatusCode((int)HttpStatusCode.InternalServerError, res);
+            }
+        }
     }
 }
