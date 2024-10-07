@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NotePadAPI.Models;
 using NotePadAPI.Models.DTO;
@@ -14,28 +15,33 @@ namespace NotePadAPI.Controllers
     {
         private readonly IUserRepository _repo;
         private readonly IConfiguration _config;
+        private readonly ILogger<UserController> _logger;
+        private string _controller => ControllerContext.ActionDescriptor.ControllerName;
 
-        public UserController(IUserRepository repo, IConfiguration config)
+        public UserController(IUserRepository repo, IConfiguration config, ILogger<UserController> logger)
         {
             _repo = repo;
             _config = config;
+            _logger = logger;
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ApiResponse>> GetAllUsers()
         {
             ApiResponse response;
+            string apiName = ControllerContext.ActionDescriptor.ActionName;
             try
             {
                 IEnumerable<User> users = await _repo.GetAllUsers();
                 string msg = users.Any() ? "Retrieved all users" : "No users found";
                 response = Utility.CreateResponse(msg, HttpStatusCode.OK, users, true);
+                _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(response)}");
                 return Ok(response);
             }
             catch (Exception e) 
             {
                 response = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
+                _logger.LogError($"{_controller}/{apiName} - {Utility.ResponseToString(response)}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
@@ -44,24 +50,28 @@ namespace NotePadAPI.Controllers
         public async Task<ActionResult<ApiResponse>> Register([FromBody] UserRegistrationDto newUser)
         {
             ApiResponse resp;
+            string apiName = ControllerContext.ActionDescriptor.ActionName;
             try
             {
                 bool emailExists = await _repo.EmailExists(newUser.Email);
                 if (emailExists)
                 {
                     resp = Utility.CreateResponse("This email is already in use", HttpStatusCode.Conflict);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                     return Conflict(resp);
                 }
 
                 if (!UserUtils.IsValidEmail(newUser.Email))
                 {
                     resp = Utility.CreateResponse("Email is not valid", HttpStatusCode.BadRequest);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                     return BadRequest(resp);
                 }
 
                 if (!UserUtils.IsPasswordValid(newUser.Password))
                 {
                     resp = Utility.CreateResponse("Password is not valid", HttpStatusCode.BadRequest);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                     return BadRequest(resp);
                 }
 
@@ -83,11 +93,13 @@ namespace NotePadAPI.Controllers
                     Email = newUser.Email
                 };
                 resp = Utility.CreateResponse("Registration successful", HttpStatusCode.Created, createdUser, true);
+                _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                 return CreatedAtAction(nameof(Register), resp);
             }
             catch (Exception e) 
             {
                 resp = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
+                _logger.LogError($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, resp);
             }
         }
@@ -96,19 +108,23 @@ namespace NotePadAPI.Controllers
         public async Task<ActionResult<ApiResponse>> Login([FromBody] UserLoginDto loginDto)
         {
             ApiResponse resp;
+            string apiName = ControllerContext.ActionDescriptor.ActionName;
             try
             {
+                _logger.LogInformation($"{_controller}/{apiName} - {loginDto.Email} trying to sign in.");
                 User? user = await _repo.GetUserByEmail(loginDto.Email);
 
                 if (user == null)
                 {
                     resp = Utility.CreateResponse("This email is not registered", HttpStatusCode.Conflict);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                     return Conflict(resp);
                 }
 
                 if (!UserUtils.IsPasswordCorrect(loginDto.Password, user.PasswordSalt, user.PasswordHash))
                 {
                     resp = Utility.CreateResponse("Incorrect password", HttpStatusCode.Unauthorized);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                     return Unauthorized(resp);
                 }
 
@@ -132,45 +148,15 @@ namespace NotePadAPI.Controllers
                 Response.Cookies.Append("AuthToken", token, cookieOptions);
 
                 resp = Utility.CreateResponse("Login successful", HttpStatusCode.OK, loginObj, true);
+                _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                 return Ok(resp);
             }
             catch (Exception e)
             {
                 resp = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError, e);
+                _logger.LogError($"{_controller}/{apiName} - {Utility.ResponseToString(resp)}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, resp);
             }
         }
-
-        // GET: api/<UserController>
-        //[HttpGet]
-        //public IEnumerable<string> Get()
-        //{
-        //    return new string[] { "value1", "value2" };
-        //}
-
-        // GET api/<UserController>/5
-        //[HttpGet("{id}")]
-        //public string Get(int id)
-        //{
-        //    return "value";
-        //}
-
-        // POST api/<UserController>
-        //[HttpPost]
-        //public void Post([FromBody] string value)
-        //{
-        //}
-
-        // PUT api/<UserController>/5
-        //[HttpPut("{id}")]
-        //public void Put(int id, [FromBody] string value)
-        //{
-        //}
-
-        // DELETE api/<UserController>/5
-        //[HttpDelete("{id}")]
-        //public void Delete(int id)
-        //{
-        //}
     }
 }
