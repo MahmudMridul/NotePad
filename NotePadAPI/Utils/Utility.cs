@@ -15,5 +15,10 @@ namespace NotePadAPI.Utils
                 IsSuccess = isSuccess
             };
         }
+
+        internal static string ResponseToString(ApiResponse res)
+        {
+            return $"Status: {(int)res.StatusCode} {res.Message} Data: {res.Data}";
+        }
     }
 }
