@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NotePadAPI.Models;
 using NotePadAPI.Models.DTO;
@@ -13,10 +14,13 @@ namespace NotePadAPI.Controllers
     public class NoteController : ControllerBase
     {
         private readonly INoteRepository _repo;
+        private readonly ILogger<NoteController> _logger;
+        private string _controller => ControllerContext.ActionDescriptor.ControllerName;
 
-        public NoteController(INoteRepository repo)
+        public NoteController(INoteRepository repo, ILogger<NoteController> logger)
         {
             _repo = repo;
+            _logger = logger;
         }
 
         [Authorize]
@@ -24,16 +28,19 @@ namespace NotePadAPI.Controllers
         public async Task<ActionResult<ApiResponse>> GetNotesForUser([FromBody] string email)
         {
             ApiResponse response;
+            string apiName = ControllerContext.ActionDescriptor.ActionName;
             try
             {
                 IEnumerable<Note> notes = await _repo.GetNotesForUser(email);
                 string msg = notes.Any() ? $"{notes.Count()} Notes found for this user" : "No note found for this user";
                 response = Utility.CreateResponse(msg, HttpStatusCode.OK, notes, true);
+                _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(response)}");
                 return Ok(response);
             }
             catch (Exception ex)
             {
                 response = Utility.CreateResponse(ex.Message, HttpStatusCode.InternalServerError);
+                _logger.LogError($"{_controller}/{apiName} - {Utility.ResponseToString(response)}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
@@ -43,6 +50,7 @@ namespace NotePadAPI.Controllers
         public async Task<ActionResult<ApiResponse>> GetNote(int id) 
         {
             ApiResponse res;
+            string apiName = ControllerContext.ActionDescriptor.ActionName;
             try
             {
                 Note? note = await _repo.GetNoteById(id);
@@ -50,14 +58,17 @@ namespace NotePadAPI.Controllers
                 if (note == null)
                 {
                     res = Utility.CreateResponse("Note not found.", HttpStatusCode.NotFound);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                     return NotFound(res);
                 }
                 res = Utility.CreateResponse("Retrieved note.", HttpStatusCode.OK, note, true);
+                _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return Ok(res);
             }
             catch (Exception ex)
             {
                 res = Utility.CreateResponse(ex.Message, HttpStatusCode.InternalServerError);
+                _logger.LogError($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, res);
             }
         }
@@ -67,11 +78,13 @@ namespace NotePadAPI.Controllers
         public async Task<ActionResult<ApiResponse>> CreateNote([FromBody] CreateNoteDto noteDto)
         {
             ApiResponse res;
+            string apiName = ControllerContext.ActionDescriptor.ActionName;
             try
             {
                 if (noteDto == null || noteDto.UserId <= 0 || string.IsNullOrEmpty(noteDto.Title) || string.IsNullOrEmpty(noteDto.Description)) 
                 {
                     res = Utility.CreateResponse("No data found", HttpStatusCode.BadRequest);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                     return BadRequest(res);
                 }
                 Note note = new Note
@@ -84,11 +97,13 @@ namespace NotePadAPI.Controllers
                 };
                 await _repo.CreateNote(note);
                 res = Utility.CreateResponse("Note created", HttpStatusCode.OK, note, true);
+                _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return StatusCode((int)HttpStatusCode.Created, res);
             }
             catch (Exception e)
             {
                 res = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError);
+                _logger.LogError($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, res);
             }
         }
@@ -98,11 +113,13 @@ namespace NotePadAPI.Controllers
         public async Task<ActionResult<ApiResponse>> EditNote(int id, [FromBody] EditNoteDto dto)
         {
             ApiResponse res;
+            string apiName = ControllerContext.ActionDescriptor.ActionName;
             try
             {
                 if (dto == null || string.IsNullOrEmpty(dto.Title) || string.IsNullOrEmpty(dto.Description))
                 {
                     res = Utility.CreateResponse("No data found", HttpStatusCode.BadRequest);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                     return BadRequest(res);
                 }
 
@@ -110,6 +127,7 @@ namespace NotePadAPI.Controllers
                 if (note == null)
                 {
                     res = Utility.CreateResponse("Note doesn't exist", HttpStatusCode.NotFound);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                     return NotFound(res);
                 }
 
@@ -119,11 +137,13 @@ namespace NotePadAPI.Controllers
 
                 await _repo.UpdateNote(note);
                 res = Utility.CreateResponse("Note updated", HttpStatusCode.OK, note, true);
+                _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return Ok(res);
             }
             catch (Exception e) 
             {
                 res = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError);
+                _logger.LogError($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, res);
             }
         }
@@ -133,22 +153,26 @@ namespace NotePadAPI.Controllers
         public async Task<ActionResult<ApiResponse>> DeleteNote(int id)
         {
             ApiResponse res;
+            string apiName = ControllerContext.ActionDescriptor.ActionName;
             try
             {
                 Note? note = await _repo.GetNoteById(id);
                 if (note == null)
                 {
                     res = Utility.CreateResponse("Note doesn't exist", HttpStatusCode.NotFound);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                     return NotFound(res);
                 }
 
                 await _repo.DeleteNote(note);
                 res = Utility.CreateResponse("Note deleted", HttpStatusCode.OK, note, true);
+                _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return StatusCode((int)HttpStatusCode.Gone, res);
             }
             catch (Exception e)
             {
                 res = Utility.CreateResponse(e.Message, HttpStatusCode.InternalServerError);
+                _logger.LogError($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, res);
             }
         }
