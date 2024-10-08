@@ -7,8 +7,16 @@ import {
    IconButton,
 } from "@mui/material";
 import React from "react";
+import { useDispatch } from "react-redux";
+import { setState } from "../appSlice";
 
 export default function NoteItem({ note }) {
+   const dispatch = useDispatch();
+
+   function openDelModal() {
+      dispatch(setState("delModalOpen", true));
+   }
+
    return (
       <Card variant="outlined" sx={{ mt: 2, mb: 2 }}>
          <CardHeader title={note.title} />
@@ -18,7 +26,7 @@ export default function NoteItem({ note }) {
                <EditNoteRounded fontSize="inherit" color="primary" />
             </IconButton>
 
-            <IconButton size="medium">
+            <IconButton size="medium" onClick={openDelModal}>
                <DeleteRounded fontSize="inherit" color="error" />
             </IconButton>
          </CardActions>

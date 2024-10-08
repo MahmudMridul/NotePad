@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getNotesForUser } from "../appSlice";
 import NoteList from "../components/NoteList";
 import Loading from "../components/Loading";
+import DeleteItemModal from "../components/DeleteItemModal";
 
 export default function Home() {
    const dispatch = useDispatch();
@@ -20,6 +21,7 @@ export default function Home() {
          <Loading />
          <AppBar />
          <NoteList />
+         <DeleteItemModal />
       </Box>
    );
 }

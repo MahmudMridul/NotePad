@@ -2,8 +2,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apis } from "./utils";
 
 const initialState = {
+   //FLAGS
    isAuth: false,
    isLoading: false,
+   delModalOpen: false,
 
    loggedInUserId: -1,
    loggedInUserName: "",
