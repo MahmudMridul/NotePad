@@ -6,6 +6,7 @@ const initialState = {
    isAuth: false,
    isLoading: false,
    delModalOpen: false,
+   detModalOpen: false,
 
    loggedInUserId: -1,
    loggedInUserName: "",
@@ -14,6 +15,8 @@ const initialState = {
    noteId: 0,
 
    notes: [],
+   modalTitle: "",
+   modalDesc: "",
 };
 
 export const signUp = createAsyncThunk(
