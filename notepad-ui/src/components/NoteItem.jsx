@@ -14,6 +14,7 @@ export default function NoteItem({ note }) {
    const dispatch = useDispatch();
 
    function openDelModal() {
+      dispatch(setState("noteId", note.id));
       dispatch(setState("delModalOpen", true));
    }
 

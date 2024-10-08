@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
 import { useDispatch, useSelector } from "react-redux";
-import { setState } from "../appSlice";
+import { deleteNote, getNotesForUser, setState } from "../appSlice";
 
 const style = {
    position: "absolute",
@@ -20,10 +20,18 @@ const style = {
 
 export default function DeleteItemModal() {
    const dispatch = useDispatch();
-   const delModalOpen = useSelector((store) => store.app.delModalOpen);
+   const state = useSelector((store) => store.app);
+   const { delModalOpen, noteId, loggedInUserEmail } = state;
 
    function handleClose() {
       dispatch(setState("delModalOpen", false));
+   }
+
+   function handleDelete() {
+      dispatch(deleteNote(noteId)).then(() => {
+         dispatch(getNotesForUser(loggedInUserEmail));
+      });
+      handleClose();
    }
 
    return (
@@ -45,6 +53,7 @@ export default function DeleteItemModal() {
                   color="error"
                   variant="contained"
                   sx={{ textTransform: "none" }}
+                  onClick={handleDelete}
                >
                   Delete
                </Button>

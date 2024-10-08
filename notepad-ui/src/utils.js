@@ -3,4 +3,5 @@ export const apis = {
    login: `${base}/User/login`,
    registration: `${base}/User/register`,
    notesForUser: `${base}/Note`,
+   deleteNote: `${base}/Note/delete`,
 };
