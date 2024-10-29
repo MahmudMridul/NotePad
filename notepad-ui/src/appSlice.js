@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apis } from "./utils";
-import { accordionActionsClasses } from "@mui/material";
 
 const initialState = {
    //FLAGS
