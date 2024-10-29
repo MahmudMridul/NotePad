@@ -9,3 +9,4 @@ A web application built with `.NET`, `React`, `SQL Server`.
 -  Click on the details button to view details of a note.
 -  Delete a note.
 -  Edit or Update note.
+-  Create notes.
