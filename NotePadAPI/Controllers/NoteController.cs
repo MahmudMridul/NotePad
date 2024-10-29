@@ -95,7 +95,7 @@ namespace NotePadAPI.Controllers
                     UserId = noteDto.UserId,
                 };
                 await _repo.CreateNote(note);
-                res = Utility.CreateResponse("Note created", HttpStatusCode.OK, note, true);
+                res = Utility.CreateResponse("Note created", HttpStatusCode.Created, note, true);
                 _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
                 return StatusCode((int)HttpStatusCode.Created, res);
             }
