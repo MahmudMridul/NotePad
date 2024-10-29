@@ -7,6 +7,7 @@ import NoteList from "../components/NoteList";
 import Loading from "../components/Loading";
 import DeleteItemModal from "../components/DeleteItemModal";
 import DetailsModal from "../components/DetailsModal";
+import Features from "../components/Features";
 
 export default function Home() {
    const dispatch = useDispatch();
@@ -21,6 +22,7 @@ export default function Home() {
       <Box>
          <Loading />
          <AppBar />
+         <Features />
          <NoteList />
          <DeleteItemModal />
          <DetailsModal />

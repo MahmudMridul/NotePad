@@ -3,6 +3,7 @@ import LoginRegistration from "./pages/LoginRegistration";
 import Home from "./pages/Home";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Edit from "./pages/Edit";
+import Create from "./pages/Create";
 
 export const router = createBrowserRouter([
    {
@@ -22,6 +23,14 @@ export const router = createBrowserRouter([
       element: (
          <ProtectedRoute>
             <Edit />
+         </ProtectedRoute>
+      ),
+   },
+   {
+      path: "/new",
+      element: (
+         <ProtectedRoute>
+            <Create />
          </ProtectedRoute>
       ),
    },
