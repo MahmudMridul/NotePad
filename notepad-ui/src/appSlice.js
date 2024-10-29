@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { apis } from "./utils";
+import { accordionActionsClasses } from "@mui/material";
 
 const initialState = {
    //FLAGS
@@ -133,6 +134,43 @@ export const deleteNote = createAsyncThunk(
    }
 );
 
+export const editNote = createAsyncThunk(
+   "app/editNote",
+   async (obj, { dispatch, getState }) => {
+      try {
+         const { id, title, description } = obj;
+         const url = `${apis.editNote}/${id}`;
+         const res = await fetch(url, {
+            method: "PUT",
+            headers: {
+               "Content-Type": "application/json",
+               Accept: "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify({ title, description }),
+         });
+
+         if (res.status !== 200) {
+            console.error(`HTTP Status Error ${res.status} ${res.statusText}`);
+         }
+
+         const text = await res.text();
+         if (!text) {
+            console.error("Empty response");
+         }
+
+         try {
+            const data = JSON.parse(text);
+            return data;
+         } catch (parseError) {
+            console.error(`Failed to parse text ${text}`);
+         }
+      } catch (err) {
+         console.error("app/editNote", err);
+      }
+   }
+);
+
 export const appSlice = createSlice({
    name: "app",
    initialState,
@@ -220,6 +258,16 @@ export const appSlice = createSlice({
             state.isLoading = false;
          })
          .addCase(deleteNote.rejected, (state, action) => {
+            state.isLoading = false;
+         })
+
+         .addCase(editNote.pending, (state, action) => {
+            state.isLoading = true;
+         })
+         .addCase(editNote.fulfilled, (state, action) => {
+            state.isLoading = false;
+         })
+         .addCase(editNote.rejected, (state, action) => {
             state.isLoading = false;
          });
    },
