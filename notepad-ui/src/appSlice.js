@@ -170,6 +170,42 @@ export const editNote = createAsyncThunk(
    }
 );
 
+export const createNote = createAsyncThunk(
+   "app/createNote",
+   async (obj, { dispatch, getState }) => {
+      try {
+         const url = `${apis.createNote}`;
+         const res = await fetch(url, {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+               Accept: "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(obj),
+         });
+
+         if (res.status !== 201) {
+            console.error(`HTTP Status Error ${res.status} ${res.statusText}`);
+         }
+
+         const text = await res.text();
+         if (!text) {
+            console.error("Empty response");
+         }
+
+         try {
+            const data = JSON.parse(text);
+            return data;
+         } catch (parseError) {
+            console.error(`Failed to parse text ${text}`);
+         }
+      } catch (err) {
+         console.error("app/editNote", err);
+      }
+   }
+);
+
 export const appSlice = createSlice({
    name: "app",
    initialState,
@@ -267,6 +303,16 @@ export const appSlice = createSlice({
             state.isLoading = false;
          })
          .addCase(editNote.rejected, (state, action) => {
+            state.isLoading = false;
+         })
+
+         .addCase(createNote.pending, (state, action) => {
+            state.isLoading = true;
+         })
+         .addCase(createNote.fulfilled, (state, action) => {
+            state.isLoading = false;
+         })
+         .addCase(createNote.rejected, (state, action) => {
             state.isLoading = false;
          });
    },
