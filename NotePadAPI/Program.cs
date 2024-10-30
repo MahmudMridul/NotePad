@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -64,6 +65,12 @@ namespace NotePadAPI
             #endregion
 
             #region Controller Configurations
+
+            builder.Services.Configure<FormOptions>(x =>
+            {
+                x.MultipartBodyLengthLimit = 5 * 1024 * 1024; // 5MB
+            });
+
             builder.Services.AddControllers(
                 op => op.Filters.Add(new ProducesAttribute("application/json"))
             );
