@@ -6,4 +6,5 @@ export const apis = {
    deleteNote: `${base}/Note/delete`,
    editNote: `${base}/Note/edit`,
    createNote: `${base}/Note/create`,
+   file: `${base}/Note/import`,
 };

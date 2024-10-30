@@ -206,6 +206,41 @@ export const createNote = createAsyncThunk(
    }
 );
 
+export const importFile = createAsyncThunk(
+   "app/importFile",
+   async (obj, { dispatch, getState }) => {
+      try {
+         const url = `${apis.file}`;
+         const res = await fetch(url, {
+            method: "POST",
+            headers: {
+               Accept: "application/json",
+            },
+            credentials: "include",
+            body: obj,
+         });
+
+         if (res.status !== 200) {
+            console.error(`HTTP Status Error ${res.status} ${res.statusText}`);
+         }
+
+         const text = await res.text();
+         if (!text) {
+            console.error("Empty response");
+         }
+
+         try {
+            const data = JSON.parse(text);
+            return data;
+         } catch (parseError) {
+            console.error(`Failed to parse text ${text}`);
+         }
+      } catch (err) {
+         console.error("app/importFile", err);
+      }
+   }
+);
+
 export const appSlice = createSlice({
    name: "app",
    initialState,
@@ -313,6 +348,16 @@ export const appSlice = createSlice({
             state.isLoading = false;
          })
          .addCase(createNote.rejected, (state, action) => {
+            state.isLoading = false;
+         })
+
+         .addCase(importFile.pending, (state, action) => {
+            state.isLoading = true;
+         })
+         .addCase(importFile.fulfilled, (state, action) => {
+            state.isLoading = false;
+         })
+         .addCase(importFile.rejected, (state, action) => {
             state.isLoading = false;
          });
    },

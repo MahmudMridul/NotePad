@@ -1,6 +1,7 @@
 import { Button } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import FileUpload from "./FileUpload";
 
 export default function Features() {
    const navigate = useNavigate();
@@ -8,6 +9,7 @@ export default function Features() {
    function gotoCreate() {
       navigate("/new");
    }
+
    return (
       <div>
          <Button
@@ -18,6 +20,7 @@ export default function Features() {
          >
             Create
          </Button>
+         <FileUpload />
       </div>
    );
 }
