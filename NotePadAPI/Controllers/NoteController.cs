@@ -179,12 +179,14 @@ namespace NotePadAPI.Controllers
         [Authorize]
         [HttpPost("import")]
         [Consumes("multipart/form-data")]
-        public async Task<ActionResult<ApiResponse>> ImportFromFile([FromForm] IFormFile file)
+        public async Task<ActionResult<ApiResponse>> ImportFromFile([FromForm] ImportFileDto dto)
         {
+            IFormFile file = dto.File;
+            int userId = dto.Id;
             ApiResponse res;
             string apiName = ControllerContext.ActionDescriptor.ActionName;
             int maxFileSize = 5 * 1024 * 1024;
-            string allowedExtension = ".txt";
+            string supportedExtension = ".txt";
             try
             {
                 if (file == null || file.Length == 0)
@@ -202,9 +204,29 @@ namespace NotePadAPI.Controllers
                 }
 
                 string fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
-                _logger.LogInformation($"{_controller}/{apiName} - Uploaded file extension{fileExtension}");
 
-                res = Utility.CreateResponse("Test", HttpStatusCode.OK, "Test", true);
+                if (fileExtension != supportedExtension)
+                {
+                    res = Utility.CreateResponse("Unsupported file format. Only .txt files are supported", HttpStatusCode.BadRequest);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
+                    return BadRequest(res);
+                }
+
+                List<Note> list = await FileUtils.GetNotesFromTextFile(file, userId);
+
+                if(list.Count <= 0)
+                {
+                    res = Utility.CreateResponse("Unsupported format", HttpStatusCode.BadRequest);
+                    _logger.LogInformation($"{_controller}/{apiName} - {Utility.ResponseToString(res)}");
+                    return BadRequest(res);
+                }
+
+                foreach (Note note in list)
+                {
+                    await _repo.CreateNote(note);
+                }
+
+                res = Utility.CreateResponse($"{list.Count} Notes created from file", HttpStatusCode.OK, list, true);
                 return Ok(res);
             }
             catch (Exception e)

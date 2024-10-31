@@ -2,11 +2,14 @@ import React, { useState, useRef } from "react";
 import { Button, Typography, Box } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
-import { useDispatch } from "react-redux";
-import { importFile } from "../appSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { getNotesForUser, importFile } from "../appSlice";
 
 const FileUpload = () => {
    const dispatch = useDispatch();
+
+   const state = useSelector((store) => store.app);
+   const { loggedInUserId, loggedInUserEmail } = state;
 
    const [selectedFile, setSelectedFile] = useState(null);
    const [uploading, setUploading] = useState(false);
@@ -25,35 +28,12 @@ const FileUpload = () => {
    };
 
    function handleUpload() {
-      // if (!selectedFile) {
-      //    alert("Please select a file first");
-      //    return;
-      // }
-      // try {
-      //    setUploading(true);
-      //    const formData = new FormData();
-      //    formData.append("file", selectedFile);
-      //    const response = await fetch("your-api-endpoint/upload", {
-      //       method: "POST",
-      //       body: formData,
-      //    });
-      //    if (!response.ok) {
-      //       throw new Error("Upload failed");
-      //    }
-      //    alert("File uploaded successfully");
-      //    // Clear the selected file after successful upload
-      //    setSelectedFile(null);
-      //    // Reset the file input
-      //    fileInputRef.current.value = "";
-      // } catch (error) {
-      //    console.error("Error uploading file:", error);
-      //    alert("Error uploading file: " + error.message);
-      // } finally {
-      //    setUploading(false);
-      // }
       const formData = new FormData();
+      formData.append("id", loggedInUserId);
       formData.append("file", selectedFile);
-      dispatch(importFile(formData));
+      dispatch(importFile(formData)).then(() => {
+         dispatch(getNotesForUser(loggedInUserEmail));
+      });
    }
 
    return (
