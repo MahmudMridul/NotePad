@@ -10,3 +10,4 @@ A web application built with `.NET`, `React`, `SQL Server`.
 -  Delete a note.
 -  Edit or Update note.
 -  Create notes.
+-  Create notes by importing text file.
