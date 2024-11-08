@@ -1,5 +1,4 @@
 ﻿using NotePadAPI.Models;
-using NotePadAPI.Models.DTO;
 
 namespace NotePadAPI.Utils
 {

@@ -24,10 +24,11 @@ namespace NotePadAPI.Repository
             return await _db.Users.AnyAsync(user => user.Email == email);   
         }
 
-        public async void RegisterUser(User user)
+        public async Task<User> RegisterUser(User user)
         {
             await _db.Users.AddAsync(user);
             await _db.SaveChangesAsync();
+            return user;
         }
 
         public async Task<User?> GetUserByEmail(string email)
