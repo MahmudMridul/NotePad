@@ -12,7 +12,6 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { signIn, signUp } from "../appSlice";
 import { useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import {
@@ -22,6 +21,7 @@ import {
    isEightChars,
    isValidEmail,
 } from "../utils/functions";
+import { signUp } from "../appSlice";
 
 export default function Signup() {
    const dispatch = useDispatch();
@@ -54,7 +54,7 @@ export default function Signup() {
 
    function handleEmail(e) {
       let v = e.target.value;
-      // validateEmail(v);
+      validateEmail(v);
       setEmail(v);
    }
 
@@ -77,17 +77,22 @@ export default function Signup() {
    function validatePassword(pass) {
       if (pass.length === 0) {
          setPassError(false);
+         return;
       }
 
-      if (isEightChars(pass)) {
+      let notValid =
+         pass.length > 0 &&
+         (!isEightChars(pass) ||
+            !containsBothCases(pass) ||
+            !containsNumber(pass) ||
+            !containsSpecialCharacter(pass));
+
+      console.log(notValid);
+
+      if (notValid) {
+         setPassError(true);
       } else {
-         setEmailError(true);
-      }
-
-      if (!isEightChars(pass)) {
-         setPassError(true);
-      } else if (isEightChars(pass) && !containsBothCases(pass)) {
-         setPassError(true);
+         setPassError(false);
       }
    }
 
