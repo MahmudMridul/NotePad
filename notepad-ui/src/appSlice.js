@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { apis } from "./utils";
+import { apis } from "./utils/apiUrls";
 
 const initialState = {
    //FLAGS

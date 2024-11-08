@@ -15,16 +15,25 @@ import { useDispatch } from "react-redux";
 import { signIn, signUp } from "../appSlice";
 import { useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
+import {
+   containsBothCases,
+   containsNumber,
+   containsSpecialCharacter,
+   isEightChars,
+   isValidEmail,
+} from "../utils/functions";
 
-export default function LoginRegistration() {
+export default function Signup() {
    const dispatch = useDispatch();
 
    const [showPassword, setShowPassword] = useState(false);
-   const [isLogin, setIsLogin] = useState(true);
 
    const [name, setName] = useState("");
    const [email, setEmail] = useState("");
    const [password, setPassword] = useState("");
+
+   const [emailError, setEmailError] = useState(false);
+   const [passError, setPassError] = useState(false);
 
    const navigate = useNavigate();
 
@@ -38,11 +47,6 @@ export default function LoginRegistration() {
       setPassword("");
    }
 
-   function toggleSigninSignup() {
-      resetFields();
-      setIsLogin(!isLogin);
-   }
-
    function handleName(e) {
       let v = e.target.value;
       setName(v);
@@ -50,34 +54,41 @@ export default function LoginRegistration() {
 
    function handleEmail(e) {
       let v = e.target.value;
+      // validateEmail(v);
       setEmail(v);
+   }
+
+   function validateEmail(email) {
+      if (email.length === 0) {
+         setEmailError(false);
+      } else if (email.length >= 6 && !isValidEmail(email)) {
+         setEmailError(true);
+      } else if (email.length >= 6 && isValidEmail(email)) {
+         setEmailError(false);
+      }
    }
 
    function handlePassword(e) {
       let v = e.target.value;
+      validatePassword(v);
       setPassword(v);
    }
 
-   function handleSignInSignUp() {
-      if (isLogin) {
-         handleSignIn();
-      } else {
-         handleSignUp();
+   function validatePassword(pass) {
+      if (pass.length === 0) {
+         setPassError(false);
       }
-   }
 
-   function handleSignIn() {
-      const obj = {
-         email,
-         password,
-      };
-      dispatch(signIn(obj)).then((res) => {
-         if (res.payload.isSuccess) {
-            navigate("/home");
-         } else {
-            console.log("stay in this page");
-         }
-      });
+      if (isEightChars(pass)) {
+      } else {
+         setEmailError(true);
+      }
+
+      if (!isEightChars(pass)) {
+         setPassError(true);
+      } else if (isEightChars(pass) && !containsBothCases(pass)) {
+         setPassError(true);
+      }
    }
 
    function handleSignUp() {
@@ -87,6 +98,10 @@ export default function LoginRegistration() {
          password,
       };
       dispatch(signUp(obj));
+   }
+
+   function gotoSignin() {
+      navigate("/");
    }
 
    return (
@@ -102,7 +117,7 @@ export default function LoginRegistration() {
          <Loading />
          <Box sx={{ p: 2, display: "flex", flexDirection: "column" }}>
             <TextField
-               sx={{ mb: 3, width: 300, display: isLogin ? "none" : "inherit" }}
+               sx={{ mb: 3, width: 300, display: "inherit" }}
                required
                label="Name"
                type="text"
@@ -113,6 +128,7 @@ export default function LoginRegistration() {
 
             <TextField
                sx={{ mb: 3, width: 300 }}
+               error={emailError}
                required
                label="Email"
                type="email"
@@ -122,17 +138,14 @@ export default function LoginRegistration() {
             />
 
             <FormControl size="small" variant="outlined" required>
-               <InputLabel htmlFor="outlined-adornment-password">
-                  Password
-               </InputLabel>
+               <InputLabel>Password</InputLabel>
                <OutlinedInput
-                  sx={{ width: 300, mb: 3 }}
-                  id="outlined-adornment-password"
+                  sx={{ width: 300, mb: 0 }}
+                  error={passError}
                   type={showPassword ? "text" : "password"}
                   endAdornment={
                      <InputAdornment position="end">
                         <IconButton
-                           aria-label="toggle password visibility"
                            onClick={handleClickShowPassword}
                            edge="end"
                         >
@@ -146,21 +159,56 @@ export default function LoginRegistration() {
                />
             </FormControl>
 
+            <Typography sx={{ mt: 1 }} variant="caption" color="info">
+               Password should have
+            </Typography>
+            <Typography
+               variant="caption"
+               color={
+                  password.length > 0 && isEightChars(password)
+                     ? "success"
+                     : "warning"
+               }
+            >
+               at least 8 characters
+            </Typography>
+            <Typography
+               variant="caption"
+               color={containsBothCases(password) ? "success" : "warning"}
+            >
+               capital and small letters
+            </Typography>
+            <Typography
+               variant="caption"
+               color={containsNumber(password) ? "success" : "warning"}
+            >
+               at least 1 numeric character
+            </Typography>
+            <Typography
+               sx={{ mb: 4 }}
+               variant="caption"
+               color={
+                  containsSpecialCharacter(password) ? "success" : "warning"
+               }
+            >
+               at least 1 special character
+            </Typography>
+
             <Button
                sx={{ width: 300, mb: 3 }}
                variant="outlined"
-               onClick={handleSignInSignUp}
+               onClick={handleSignUp}
             >
-               {isLogin ? "Sign In" : "Sign Up"}
+               Sign Up
             </Button>
 
             <Typography
                sx={{ cursor: "pointer" }}
                align="right"
                color="info"
-               onClick={toggleSigninSignup}
+               onClick={gotoSignin}
             >
-               {isLogin ? "Create an account" : "Sign In"}
+               Sign In
             </Typography>
          </Box>
       </Box>
